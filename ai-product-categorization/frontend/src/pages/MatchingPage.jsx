@@ -6,6 +6,8 @@ export default function MatchingPage() {
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState(null);
     const [status, setStatus] = useState('Idle');
+    const [isConfirmed, setIsConfirmed] = useState(false);
+    const [isVerifying, setIsVerifying] = useState(false);
 
     const handleMatch = () => {
         if (!desc) return;
@@ -41,6 +43,27 @@ export default function MatchingPage() {
 
     const handleTranscriptUpdate = (newText) => {
         setDesc(newText);
+        setIsConfirmed(false);
+    };
+
+    const handleVerifyVoice = () => {
+        if (!desc) return;
+        window.dispatchEvent(new Event('stop-mic'));
+        setIsVerifying(true);
+        setStatus('Verifying Input...');
+
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance();
+        msg.text = `You said: ${desc}. Is this information correct and ready to proceed?`;
+        msg.lang = 'hi-IN';
+
+        msg.onend = () => {
+            setIsVerifying(false);
+            setIsConfirmed(true);
+            setStatus('Verified. Ready for Match.');
+        };
+
+        window.speechSynthesis.speak(msg);
     };
 
     return (
@@ -84,19 +107,16 @@ export default function MatchingPage() {
                         </div>
                     </div>
 
-                    <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-start' }}>
-                        <button
-                            className="btn btn-primary btn-large"
-                            onClick={handleMatch}
-                            disabled={!desc || loading}
-                        >
-                            {loading ? (
-                                <>
-                                    <span className="anim-spin" style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid #ffffff', borderTopColor: 'transparent', borderRadius: '50%', marginRight: '8px' }}></span>
-                                    Finding Best SNP...
-                                </>
-                            ) : 'Find SNP Match 🤝'}
-                        </button>
+                    <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-start', gap: '16px' }}>
+                        {!isConfirmed ? (
+                            <button className="btn btn-secondary btn-large" onClick={handleVerifyVoice} disabled={!desc || isVerifying}>
+                                {isVerifying ? 'Speaking...' : 'Verify Input 🗣️'}
+                            </button>
+                        ) : (
+                            <button className="btn btn-primary btn-large" onClick={handleMatch} disabled={!desc || loading}>
+                                {loading ? 'Finding Best SNP...' : 'Find SNP Match 🤝'}
+                            </button>
+                        )}
                     </div>
                 </div>
 

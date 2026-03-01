@@ -4,6 +4,18 @@ export default function MicrophoneButton({ onTranscriptUpdate, onStatusChange })
     const [isListening, setIsListening] = useState(false);
     const recognitionRef = useRef(null);
 
+    useEffect(() => {
+        const handleStopMic = () => {
+            if (recognitionRef.current) {
+                try {
+                    recognitionRef.current.stop();
+                } catch (e) { }
+            }
+        };
+        window.addEventListener('stop-mic', handleStopMic);
+        return () => window.removeEventListener('stop-mic', handleStopMic);
+    }, []);
+
     const toggleListening = () => {
         if (isListening) {
             recognitionRef.current?.stop();

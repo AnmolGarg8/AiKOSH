@@ -24,6 +24,7 @@ export default function VoiceFormFill({ params }) {
 
     const handleVerifyVoice = () => {
         if (!transcript) return;
+        window.dispatchEvent(new Event('stop-mic'));
         setIsVerifying(true);
         setStatus('Verifying Input...');
 
@@ -107,7 +108,7 @@ export default function VoiceFormFill({ params }) {
                 <div className="action-buttons">
                     <button className="btn btn-outline" onClick={handleClear}>Clear</button>
                     {!isConfirmed ? (
-                        <button className="btn btn-secondary" onClick={handleVerifyVoice} disabled={!transcript || isVerifying || status === 'Listening...'}>
+                        <button className="btn btn-secondary" onClick={handleVerifyVoice} disabled={!transcript || isVerifying}>
                             {isVerifying ? 'Speaking...' : 'Verify Input 🗣️'}
                         </button>
                     ) : (
