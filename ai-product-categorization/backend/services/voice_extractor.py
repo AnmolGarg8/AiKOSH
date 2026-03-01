@@ -99,24 +99,25 @@ class VoiceExtractorService:
             prompt_instruction = f"Ask the user to creatively provide their `{field}` for a form registration."
 
         lang_mapping = {
-            "hi-IN": "Hindi",
+            "hi-IN": "Hindi (Devanagari script: हिंदी)",
             "en-IN": "English",
-            "ta-IN": "Tamil",
-            "te-IN": "Telugu",
-            "mr-IN": "Marathi",
-            "bn-IN": "Bengali",
-            "gu-IN": "Gujarati",
-            "kn-IN": "Kannada",
-            "ml-IN": "Malayalam",
-            "pa-IN": "Punjabi"
+            "ta-IN": "Tamil (Tamil script: தமிழ்)",
+            "te-IN": "Telugu (Telugu script: తెలుగు)",
+            "mr-IN": "Marathi (Devanagari script: मराठी)",
+            "bn-IN": "Bengali (Bengali script: বাংলা)",
+            "gu-IN": "Gujarati (Gujarati script: ગુજરાતી)",
+            "kn-IN": "Kannada (Kannada script: ಕನ್ನಡ)",
+            "ml-IN": "Malayalam (Malayalam script: മലയാളം)",
+            "pa-IN": "Punjabi (Gurmukhi script: ਪੰਜਾਬੀ)"
         }
         lang_name = lang_mapping.get(language, "English")
 
         system_prompt = f"""
         You are an Indian Government MSME Voice Assistant conversational AI.
         Task: {prompt_instruction}
-        Language requested: {lang_name} (Code: {language}). You MUST translate your ONLY sentence to {lang_name} natively.
-        Constraint: Return ONLY the exact translated sentence in {lang_name}. No English translations alongside it, no quotes, no conversational filler, no markdown. Keep it very short, polite, and natural.
+        Language requested: {lang_name} (Code: {language}). You MUST translate your sentence to {lang_name} natively.
+        Constraint 1: You must strictly use the native alphabet and script for {lang_name}. Do NOT use Latin/English letters unless the language requested is exactly 'English'.
+        Constraint 2: Return ONLY the exact translated sentence. No English translations alongside it, no quotes, no conversational filler, no markdown. Keep it very short, polite, and natural.
         """
         
         try:
