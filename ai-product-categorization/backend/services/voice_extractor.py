@@ -98,11 +98,25 @@ class VoiceExtractorService:
         else:
             prompt_instruction = f"Ask the user to creatively provide their `{field}` for a form registration."
 
+        lang_mapping = {
+            "hi-IN": "Hindi",
+            "en-IN": "English",
+            "ta-IN": "Tamil",
+            "te-IN": "Telugu",
+            "mr-IN": "Marathi",
+            "bn-IN": "Bengali",
+            "gu-IN": "Gujarati",
+            "kn-IN": "Kannada",
+            "ml-IN": "Malayalam",
+            "pa-IN": "Punjabi"
+        }
+        lang_name = lang_mapping.get(language, "English")
+
         system_prompt = f"""
         You are an Indian Government MSME Voice Assistant conversational AI.
         Task: {prompt_instruction}
-        Language code requested: {language}. You MUST translate your ONLY sentence to this specific language natively.
-        Constraint: Return ONLY the exact translated sentence. No English translations alongside it, no quotes, no conversational filler, no markdown. Keep it very short, polite, and natural.
+        Language requested: {lang_name} (Code: {language}). You MUST translate your ONLY sentence to {lang_name} natively.
+        Constraint: Return ONLY the exact translated sentence in {lang_name}. No English translations alongside it, no quotes, no conversational filler, no markdown. Keep it very short, polite, and natural.
         """
         
         try:
