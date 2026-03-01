@@ -12,67 +12,61 @@ const UploadIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="n
 const FileIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>;
 const StoreIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path><path d="M2 7h20"></path><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"></path></svg>;
 
-// Voice Recognition Hook
-const useSpeechRecognition = (onTranscriptChange) => {
+// Reusable Voice Input Component
+const VoiceInputBox = ({ value, onChange, placeholder, onSubmit, submitLabel, icon: IconComponent, height = "120px" }) => {
     const [isListening, setIsListening] = useState(false);
     const recognitionRef = useRef(null);
-
-    useEffect(() => {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            recognitionRef.current = new SpeechRecognition();
-            recognitionRef.current.continuous = true;
-            recognitionRef.current.interimResults = true;
-            recognitionRef.current.lang = 'hi-IN'; // Default to Hindi-India (supports English mix)
-
-            recognitionRef.current.onresult = (event) => {
-                let currentTranscript = '';
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    currentTranscript += event.results[i][0].transcript;
-                }
-                if (onTranscriptChange) {
-                    onTranscriptChange(currentTranscript);
-                }
-            };
-
-            recognitionRef.current.onerror = (event) => {
-                console.error("Speech recognition error", event.error);
-                setIsListening(false);
-            };
-
-            recognitionRef.current.onend = () => {
-                setIsListening(false);
-            };
-        }
-        return () => {
-            if (recognitionRef.current) {
-                recognitionRef.current.stop();
-            }
-        };
-    }, [onTranscriptChange]);
+    const originalValueRef = useRef('');
 
     const toggleListening = () => {
         if (isListening) {
             recognitionRef.current?.stop();
+            setIsListening(false);
         } else {
-            if (!recognitionRef.current) {
-                alert("Your browser does not support speech recognition. Please try Google Chrome.");
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Your browser does not support speech recognition. Please try Google Chrome, Edge, or Safari.");
                 return;
             }
-            onTranscriptChange('');
-            recognitionRef.current.start();
-            setIsListening(true);
+
+            originalValueRef.current = value; // Save starting text
+
+            try {
+                const recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'hi-IN'; // Works for Hindi and English
+
+                recognition.onresult = (event) => {
+                    let currentTranscript = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        currentTranscript += event.results[i][0].transcript;
+                    }
+                    const prefix = originalValueRef.current ? originalValueRef.current + ' ' : '';
+                    onChange(prefix + currentTranscript);
+                };
+
+                recognition.onerror = (event) => {
+                    console.error("Speech recognition error:", event.error);
+                    if (event.error === 'not-allowed') {
+                        alert("Microphone permission denied. Please allow microphone access in your browser settings.");
+                    }
+                    setIsListening(false);
+                };
+
+                recognition.onend = () => {
+                    setIsListening(false);
+                };
+
+                recognitionRef.current = recognition;
+                recognition.start();
+                setIsListening(true);
+            } catch (err) {
+                console.error("Failed to start speech recognition", err);
+                setIsListening(false);
+            }
         }
     };
-
-    return { isListening, toggleListening };
-};
-
-// Reusable Voice Input Component
-const VoiceInputBox = ({ value, onChange, placeholder, onSubmit, submitLabel, icon: IconComponent, height = "120px" }) => {
-    const { isListening, toggleListening } = useSpeechRecognition((newTranscript) => {
-        onChange(value + ' ' + newTranscript);
-    });
 
     return (
         <div style={{ width: '100%', marginBottom: '16px' }}>
@@ -87,7 +81,7 @@ const VoiceInputBox = ({ value, onChange, placeholder, onSubmit, submitLabel, ic
                 <div style={{ position: 'absolute', bottom: '16px', right: '16px', display: 'flex', gap: '8px', alignItems: 'center' }}>
                     {isListening && <span style={{ color: '#ef4444', fontSize: '12px', fontWeight: '500', animation: 'pulse 1.5s infinite' }}>Listening...</span>}
                     <button
-                        onClick={toggleListening}
+                        onClick={(e) => { e.preventDefault(); toggleListening(); }}
                         style={{
                             width: '40px', height: '40px', borderRadius: '50%', border: 'none',
                             background: isListening ? '#fee2e2' : '#f1f5f9',
