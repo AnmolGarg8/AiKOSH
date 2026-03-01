@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 import time
-from models.schemas import ProcessVoiceRequest, ProcessVoiceResponse, FieldExtraction
+from models.schemas import ProcessVoiceRequest, ProcessVoiceResponse, FieldExtraction, GeneratePromptRequest, GeneratePromptResponse
 from services.voice_extractor import extractor
 
 router = APIRouter(
@@ -33,3 +33,8 @@ def process_voice(req: ProcessVoiceRequest):
         unfilled_fields=result["unfilled"],
         processing_time_ms=processing_time_ms
     )
+
+@router.post("/prompt", response_model=GeneratePromptResponse)
+def generate_prompt(req: GeneratePromptRequest):
+    prompt = extractor.generate_prompt(req.field, req.language)
+    return GeneratePromptResponse(prompt=prompt)

@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-export default function MicrophoneButton({ onTranscriptUpdate, onStatusChange }) {
+export default function MicrophoneButton({ language, setLanguage, onTranscriptUpdate, onStatusChange }) {
     const [isListening, setIsListening] = useState(false);
-    const [language, setLanguage] = useState('hi-IN');
     const recognitionRef = useRef(null);
     const isListeningRef = useRef(false);
 

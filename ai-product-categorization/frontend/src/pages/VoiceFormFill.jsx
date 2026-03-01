@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from "wouter";
-import { fetchForms, submitVoiceData } from '../services/api';
+import { fetchForms, submitVoiceData, generateGuidedPrompt } from '../services/api';
 
 import MicrophoneButton from '../components/MicrophoneButton';
 import TranscriptDisplay from '../components/TranscriptDisplay';
@@ -17,22 +17,25 @@ export default function VoiceFormFill({ params }) {
     const [isConfirmed, setIsConfirmed] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
     const [guidedActive, setGuidedActive] = useState(false);
+    const [language, setLanguage] = useState('hi-IN');
 
     const getNextUnfilledField = () => {
         if (!formDef) return null;
         return formDef.fields.find(f => !extractedData[f] || !extractedData[f].value);
     };
 
-    const startGuidedInterview = () => {
+    const startGuidedInterview = async () => {
         setGuidedActive(true);
         const nextField = getNextUnfilledField();
         if (nextField) {
             const readable = nextField.replace(/_/g, ' ').toUpperCase();
             setStatus(`Guided Mode: Asking for ${readable}`);
             window.speechSynthesis.cancel();
+
+            const p = await generateGuidedPrompt(readable, language);
             const msg = new SpeechSynthesisUtterance();
-            msg.text = `Please tell me your ${readable}`;
-            msg.lang = 'hi-IN';
+            msg.text = p.prompt;
+            msg.lang = language;
             msg.onend = () => {
                 window.dispatchEvent(new Event('start-mic'));
             };
@@ -43,29 +46,36 @@ export default function VoiceFormFill({ params }) {
     };
 
     useEffect(() => {
-        // Trigger next question whenever extractedData changes if we are in guided mode
         if (!guidedActive || !formDef) return;
 
         const nextField = getNextUnfilledField();
-        if (nextField) {
-            const readable = nextField.replace(/_/g, ' ').toUpperCase();
-            setStatus(`Guided Mode: Asking for ${readable}`);
-            window.speechSynthesis.cancel();
-            const msg = new SpeechSynthesisUtterance();
-            msg.text = `Got it. Now, what is your ${readable}?`;
-            msg.lang = 'hi-IN';
-            msg.onend = () => {
-                window.dispatchEvent(new Event('start-mic'));
-            };
-            setTimeout(() => window.speechSynthesis.speak(msg), 500);
-        } else {
-            setStatus('Guided Mode: All fields completed!');
-            const msg = new SpeechSynthesisUtterance();
-            msg.text = `Thank you. The form is fully completed. You can now review and submit your application.`;
-            msg.lang = 'hi-IN';
-            setTimeout(() => window.speechSynthesis.speak(msg), 500);
-            setGuidedActive(false);
-        }
+
+        const askNext = async () => {
+            if (nextField) {
+                const readable = nextField.replace(/_/g, ' ').toUpperCase();
+                setStatus(`Guided Mode: Asking for ${readable}`);
+                window.speechSynthesis.cancel();
+
+                const p = await generateGuidedPrompt(readable, language);
+                const msg = new SpeechSynthesisUtterance();
+                msg.text = p.prompt;
+                msg.lang = language;
+                msg.onend = () => {
+                    window.dispatchEvent(new Event('start-mic'));
+                };
+                setTimeout(() => window.speechSynthesis.speak(msg), 500);
+            } else {
+                setStatus('Guided Mode: All fields completed!');
+                const p = await generateGuidedPrompt("COMPLETED", language);
+                const msg = new SpeechSynthesisUtterance();
+                msg.text = p.prompt;
+                msg.lang = language;
+                setTimeout(() => window.speechSynthesis.speak(msg), 500);
+                setGuidedActive(false);
+            }
+        };
+
+        askNext();
     }, [extractedData]);
 
     const handleTranscriptUpdate = (newText) => {
@@ -169,6 +179,8 @@ export default function VoiceFormFill({ params }) {
 
                 <div className="mic-container">
                     <MicrophoneButton
+                        language={language}
+                        setLanguage={setLanguage}
                         onTranscriptUpdate={handleTranscriptUpdate}
                         onStatusChange={setStatus}
                     />

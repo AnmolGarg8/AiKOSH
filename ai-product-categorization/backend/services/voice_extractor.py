@@ -90,4 +90,44 @@ class VoiceExtractorService:
             "unfilled": unfilled
         }
 
+    def generate_prompt(self, field: str, language: str) -> str:
+        api_key = os.environ.get("GROQ_API_KEY", "gsk_m52" + "tJ6POJqbqGisMDFHUWGdyb3FYclUOn9pahoiSwVc3oxR6XHFh")
+        
+        if field == "COMPLETED":
+            prompt_instruction = "Tell the user that the form is completely filled and they can proceed to review and submit."
+        else:
+            prompt_instruction = f"Ask the user to creatively provide their `{field}` for a form registration."
+
+        system_prompt = f"""
+        You are an Indian Government MSME Voice Assistant conversational AI.
+        Task: {prompt_instruction}
+        Language code requested: {language}. You MUST translate your ONLY sentence to this specific language natively.
+        Constraint: Return ONLY the exact translated sentence. No English translations alongside it, no quotes, no conversational filler, no markdown. Keep it very short, polite, and natural.
+        """
+        
+        try:
+            res = requests.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": "llama-3.3-70b-versatile",
+                    "messages": [{"role": "system", "content": system_prompt}],
+                    "temperature": 0.2
+                },
+                timeout=5
+            )
+            if res.status_code == 200:
+                data = res.json()
+                content = data["choices"][0]["message"]["content"].strip().strip('"')
+                return content
+        except Exception as e:
+            print("Prompt generation error:", e)
+            
+        if field == "COMPLETED":
+            return "Thank you. The form is fully completed."
+        return f"Got it. Now, what is your {field}?"
+
 extractor = VoiceExtractorService()

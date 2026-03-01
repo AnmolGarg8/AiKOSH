@@ -35,3 +35,17 @@ export const predictCategory = async (description) => {
     if (!res.ok) throw new Error("Categorization failed");
     return res.json();
 };
+
+export const generateGuidedPrompt = async (field, language) => {
+    try {
+        const res = await fetch(`${API_URL}/voice/prompt`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ field, language })
+        });
+        if (!res.ok) return { prompt: `Please provide your ${field}` };
+        return await res.json();
+    } catch {
+        return { prompt: `Please provide your ${field}` };
+    }
+};

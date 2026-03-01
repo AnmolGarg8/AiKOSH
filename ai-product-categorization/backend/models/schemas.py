@@ -33,3 +33,10 @@ class CategorizeResponse(BaseModel):
     confidence: int
     tags: List[str]
     processing_time_ms: int
+
+class GeneratePromptRequest(BaseModel):
+    field: str
+    language: str
+
+class GeneratePromptResponse(BaseModel):
+    prompt: str
