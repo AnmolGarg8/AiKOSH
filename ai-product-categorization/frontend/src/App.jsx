@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 // Icons
 const MicIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>;
+const MicOffIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>;
 const CheckCircleIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>;
 const NetworkIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>;
 const SparklesIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M19 17v4"></path><path d="M3 5h4"></path><path d="M17 19h4"></path></svg>;
@@ -11,6 +12,102 @@ const UploadIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="n
 const FileIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>;
 const StoreIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path><path d="M2 7h20"></path><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"></path></svg>;
 
+// Voice Recognition Hook
+const useSpeechRecognition = (onTranscriptChange) => {
+    const [isListening, setIsListening] = useState(false);
+    const recognitionRef = useRef(null);
+
+    useEffect(() => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            recognitionRef.current = new SpeechRecognition();
+            recognitionRef.current.continuous = true;
+            recognitionRef.current.interimResults = true;
+            recognitionRef.current.lang = 'hi-IN'; // Default to Hindi-India (supports English mix)
+
+            recognitionRef.current.onresult = (event) => {
+                let currentTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    currentTranscript += event.results[i][0].transcript;
+                }
+                if (onTranscriptChange) {
+                    onTranscriptChange(currentTranscript);
+                }
+            };
+
+            recognitionRef.current.onerror = (event) => {
+                console.error("Speech recognition error", event.error);
+                setIsListening(false);
+            };
+
+            recognitionRef.current.onend = () => {
+                setIsListening(false);
+            };
+        }
+        return () => {
+            if (recognitionRef.current) {
+                recognitionRef.current.stop();
+            }
+        };
+    }, [onTranscriptChange]);
+
+    const toggleListening = () => {
+        if (isListening) {
+            recognitionRef.current?.stop();
+        } else {
+            if (!recognitionRef.current) {
+                alert("Your browser does not support speech recognition. Please try Google Chrome.");
+                return;
+            }
+            onTranscriptChange('');
+            recognitionRef.current.start();
+            setIsListening(true);
+        }
+    };
+
+    return { isListening, toggleListening };
+};
+
+// Reusable Voice Input Component
+const VoiceInputBox = ({ value, onChange, placeholder, onSubmit, submitLabel, icon: IconComponent, height = "120px" }) => {
+    const { isListening, toggleListening } = useSpeechRecognition((newTranscript) => {
+        onChange(value + ' ' + newTranscript);
+    });
+
+    return (
+        <div style={{ position: 'relative', width: '100%', marginBottom: '16px' }}>
+            <textarea
+                className="input-control"
+                style={{ width: '100%', minHeight: height, paddingRight: '60px', paddingBottom: '60px', resize: 'vertical' }}
+                placeholder={placeholder}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+            />
+            <div style={{ position: 'absolute', bottom: '16px', right: '16px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                {isListening && <span style={{ color: '#ef4444', fontSize: '12px', fontWeight: '500', animation: 'pulse 1.5s infinite' }}>Listening...</span>}
+                <button
+                    onClick={toggleListening}
+                    style={{
+                        width: '40px', height: '40px', borderRadius: '50%', border: 'none',
+                        background: isListening ? '#fee2e2' : '#f1f5f9',
+                        color: isListening ? '#ef4444' : '#64748b',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', transition: 'all 0.2s',
+                        boxShadow: isListening ? '0 0 0 4px rgba(239, 68, 68, 0.2)' : 'none'
+                    }}
+                    title={isListening ? "Stop listening" : "Start speaking"}
+                >
+                    {isListening ? <MicOffIcon /> : <MicIcon />}
+                </button>
+            </div>
+            {onSubmit && (
+                <button className="btn btn-primary" onClick={onSubmit} disabled={!value} style={{ width: '100%', marginTop: '16px' }}>
+                    {IconComponent && <IconComponent />} {submitLabel}
+                </button>
+            )}
+        </div>
+    );
+};
 
 export default function App() {
     const [activeTab, setActiveTab] = useState('registration');
@@ -31,8 +128,8 @@ export default function App() {
                 </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span className="badge badge-neutral">Demo Mode 🚀</span>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#64748b' }}>A</div>
+                <span className="badge badge-neutral">Voice Enabled 🎙️</span>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#64748b' }}>M</div>
             </div>
         </header>
     );
@@ -93,6 +190,10 @@ export default function App() {
           width: 0 !important;
           padding: 0 !important;
         }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: .5; }
+        }
       `}</style>
         </div>
     );
@@ -102,55 +203,45 @@ export default function App() {
 // VIEW 1: Voice-based Registration
 // ----------------------------------------------------------------------------
 function RegistrationView() {
-    const [listening, setListening] = useState(false);
     const [text, setText] = useState('');
     const [parsedData, setParsedData] = useState(null);
+    const [analyzing, setAnalyzing] = useState(false);
 
-    const simulateVoiceInput = () => {
-        setListening(true);
-        setText("");
+    const handleProcess = () => {
+        setAnalyzing(true);
         setParsedData(null);
 
-        setTimeout(() => setText("Hum "), 500);
-        setTimeout(() => setText("Hum Kanpur se "), 1000);
-        setTimeout(() => setText("Hum Kanpur se leather shoes banate hain."), 1600);
+        // Simple mock logic based on keywords
         setTimeout(() => {
-            setListening(false);
+            const lowerText = text.toLowerCase();
             setParsedData({
-                location: 'Kanpur',
-                material: 'Leather',
-                product: 'Shoes',
-                business_type: 'Manufacturer'
+                location: lowerText.includes('kanpur') ? 'Kanpur' : (lowerText.includes('delhi') ? 'Delhi' : 'Unknown'),
+                material: lowerText.includes('leather') ? 'Leather' : (lowerText.includes('cotton') ? 'Cotton' : 'Varies'),
+                product: lowerText.includes('shoes') || lowerText.includes('joote') ? 'Shoes' : (lowerText.includes('shirt') ? 'Shirts' : 'Apparel/Footwear'),
+                business_type: lowerText.includes('banate') || lowerText.includes('make') ? 'Manufacturer' : 'Retailer'
             });
-        }, 2500);
+            setAnalyzing(false);
+        }, 1500);
     };
 
     return (
         <div className="animate-fade-in">
             <div style={{ marginBottom: '24px' }}>
                 <h2 style={{ fontSize: '24px', marginBottom: '8px' }}>1️⃣ Voice-based Auto Registration</h2>
-                <p style={{ color: 'var(--text-muted)' }}>Tap the microphone and speak naturally (e.g. Hindi/English mixed). The AI will auto-fill your profile.</p>
+                <p style={{ color: 'var(--text-muted)' }}>Tap the microphone and speak naturally in Hindi or English (e.g., "Hum Kanpur se leather shoes banate hain"). The AI will extract your profile details.</p>
             </div>
 
             <div className="grid-2">
-                <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', minHeight: '300px' }}>
-                    <button
-                        onClick={simulateVoiceInput}
-                        style={{
-                            width: '80px', height: '80px', borderRadius: '50%', border: 'none',
-                            background: listening ? '#fee2e2' : '#eff6ff',
-                            color: listening ? '#ef4444' : '#3b82f6',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            boxShadow: listening ? '0 0 0 0 rgba(239, 68, 68, 0.7)' : 'none',
-                            animation: listening ? 'pulse-ring 1.5s infinite' : 'none',
-                            cursor: 'pointer', marginBottom: '24px', transition: 'all 0.3s'
-                        }}
-                    >
-                        <MicIcon />
-                    </button>
-                    <div style={{ fontSize: '18px', fontWeight: '500', color: listening ? 'var(--text-main)' : 'var(--text-muted)', minHeight: '60px' }}>
-                        {listening ? text || 'Listening...' : (text || 'Tap to speak: "Hum Kanpur se leather shoes banate hain"')}
-                    </div>
+                <div className="card">
+                    <VoiceInputBox
+                        value={text}
+                        onChange={setText}
+                        placeholder='Tap the microphone icon and say: "Hum Kanpur se leather shoes banate hain..."'
+                        onSubmit={handleProcess}
+                        submitLabel={analyzing ? "Extracting Details..." : "Process Registration"}
+                        icon={SparklesIcon}
+                        height="200px"
+                    />
                 </div>
 
                 <div className="card">
@@ -160,25 +251,25 @@ function RegistrationView() {
 
                     <div className="input-group">
                         <label className="input-label">Identified Product / Service</label>
-                        <input type="text" className="input-control" readOnly value={parsedData?.product || ''} placeholder="Waiting for voice..." />
+                        <input type="text" className="input-control" readOnly value={parsedData?.product || ''} placeholder="Waiting for processing..." />
                     </div>
                     <div className="input-group">
                         <label className="input-label">Business Type</label>
-                        <input type="text" className="input-control" readOnly value={parsedData?.business_type || ''} placeholder="Waiting for voice..." />
+                        <input type="text" className="input-control" readOnly value={parsedData?.business_type || ''} placeholder="Waiting for processing..." />
                     </div>
                     <div className="grid-2" style={{ gap: '16px' }}>
                         <div className="input-group">
                             <label className="input-label">Location</label>
-                            <input type="text" className="input-control" readOnly value={parsedData?.location || ''} placeholder="Waiting for voice..." />
+                            <input type="text" className="input-control" readOnly value={parsedData?.location || ''} placeholder="Waiting for processing..." />
                         </div>
                         <div className="input-group">
                             <label className="input-label">Core Material</label>
-                            <input type="text" className="input-control" readOnly value={parsedData?.material || ''} placeholder="Waiting for voice..." />
+                            <input type="text" className="input-control" readOnly value={parsedData?.material || ''} placeholder="Waiting for processing..." />
                         </div>
                     </div>
                     {parsedData && (
-                        <div style={{ marginTop: '24px', padding: '12px', background: '#ecfdf5', borderRadius: '8px', color: '#065f46', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <CheckCircleIcon /> Registration Data Captured Successfully!
+                        <div className="animate-fade-in" style={{ marginTop: '24px', padding: '12px', background: '#ecfdf5', borderRadius: '8px', color: '#065f46', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <CheckCircleIcon /> Registration Data Extracted Successfully!
                         </div>
                     )}
                 </div>
@@ -188,55 +279,47 @@ function RegistrationView() {
 }
 
 // ----------------------------------------------------------------------------
-// VIEW 2: AI Product Categorisation
+// VIEW 2: AI Product Categorisation (Voice Enabled)
 // ----------------------------------------------------------------------------
 function CategorizationView() {
     const [desc, setDesc] = useState('');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState(null);
 
-    const sample = "Handmade cotton kurti for women";
-
     const handleCategorize = () => {
         if (!desc) return;
         setLoading(true);
         setResult(null);
-        // Simulate AI Mock Response based on prompt
+
+        // Mock response
         setTimeout(() => {
             setResult({
                 path: ["Apparel", "Women", "Ethnic Wear", "Kurti"],
-                material: "Cotton",
-                category: "Kurti",
-                tags: ["Handmade", "Women", "Apparel"]
+                material: desc.toLowerCase().includes('cotton') ? "Cotton" : (desc.toLowerCase().includes('silk') ? "Silk" : "Mixed"),
+                category: desc.toLowerCase().includes('kurti') ? "Kurti" : "Apparel",
+                tags: ["Women", "Ethnic", "Fast-Moving"]
             });
             setLoading(false);
-        }, 1200);
+        }, 1500);
     }
 
     return (
         <div className="animate-fade-in">
             <div style={{ marginBottom: '24px' }}>
                 <h2 style={{ fontSize: '24px', marginBottom: '8px' }}>2️⃣ AI Product Categorisation</h2>
-                <p style={{ color: 'var(--text-muted)' }}>Type exactly what you sell without worrying about formats. We map it to ONDC taxonomy.</p>
+                <p style={{ color: 'var(--text-muted)' }}>Speak out exactly what you sell without worrying about formatting. We'll map it to the correct ONDC hierarchy.</p>
             </div>
 
             <div className="card" style={{ marginBottom: '24px' }}>
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-                    <button onClick={() => setDesc(sample)} style={{ fontSize: '12px', background: '#f1f5f9', border: '1px solid #e2e8f0', padding: '4px 12px', borderRadius: '999px', color: '#475569' }}>
-                        Try: "Handmade cotton kurti for women"
-                    </button>
-                </div>
-                <textarea
-                    className="input-control"
-                    rows="3"
-                    placeholder="Describe your product here..."
+                <VoiceInputBox
                     value={desc}
-                    onChange={e => setDesc(e.target.value)}
-                    style={{ marginBottom: '16px' }}
+                    onChange={setDesc}
+                    placeholder='Tap the microphone and describe your product (e.g., "Handmade cotton kurti for women")'
+                    onSubmit={handleCategorize}
+                    submitLabel={loading ? "Mapping to ONDC Taxonomy..." : "Categorize via AI"}
+                    icon={TagIcon}
+                    height="150px"
                 />
-                <button className="btn btn-primary" onClick={handleCategorize} disabled={loading || !desc} style={{ width: '100%' }}>
-                    {loading ? 'Analyzing...' : <><SparklesIcon /> Categorize via AI</>}
-                </button>
             </div>
 
             {result && (
@@ -246,7 +329,7 @@ function CategorizationView() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '24px' }}>
                         {result.path.map((node, i) => (
                             <React.Fragment key={i}>
-                                <span className="badge badge-info">{node}</span>
+                                <span className="badge badge-info" style={{ fontSize: '14px', padding: '6px 14px' }}>{node}</span>
                                 {i < result.path.length - 1 && <span style={{ color: '#94a3b8' }}>▶</span>}
                             </React.Fragment>
                         ))}
@@ -262,7 +345,7 @@ function CategorizationView() {
                             <div style={{ fontWeight: '600' }}>{result.category}</div>
                         </div>
                         <div style={{ padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                            <div style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Tags</div>
+                            <div style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Extracted Tags</div>
                             <div style={{ fontWeight: '600', color: '#64748b' }}>#{result.tags.join(" #")}</div>
                         </div>
                     </div>
@@ -273,11 +356,11 @@ function CategorizationView() {
 }
 
 // ----------------------------------------------------------------------------
-// VIEW 3: Document Auto-Verification
+// VIEW 3: Document Auto-Verification (No Voice)
 // ----------------------------------------------------------------------------
 function VerificationView() {
     const [file, setFile] = useState(null);
-    const [status, setStatus] = useState('idle'); // idle, verifying, success, error
+    const [status, setStatus] = useState('idle');
 
     const handleUpload = () => {
         setStatus('verifying');
@@ -290,7 +373,7 @@ function VerificationView() {
         <div className="animate-fade-in">
             <div style={{ marginBottom: '24px' }}>
                 <h2 style={{ fontSize: '24px', marginBottom: '8px' }}>3️⃣ Document Auto-Verification</h2>
-                <p style={{ color: 'var(--text-muted)' }}>Upload GST, PAN, or Udyam copies. Our Verification AI extracts the data and validates via mock API.</p>
+                <p style={{ color: 'var(--text-muted)' }}>Upload GST, PAN, or Udyam copies. Our Verification AI extracts the data and validates via API without manual effort.</p>
             </div>
 
             <div className="grid-2">
@@ -344,9 +427,6 @@ function VerificationView() {
                                     <span style={{ fontWeight: '500', color: '#10b981', fontSize: '14px' }}>Match Found ✓</span>
                                 </div>
                             </div>
-                            <div style={{ marginTop: '16px', fontSize: '12px', color: '#94a3b8', fontStyle: 'italic' }}>
-                                "NSIC ko manual kaam kam karna pade." - Approved by AI Bot
-                            </div>
                         </div>
                     )}
                 </div>
@@ -356,9 +436,10 @@ function VerificationView() {
 }
 
 // ----------------------------------------------------------------------------
-// VIEW 4: Smart Matching Engine
+// VIEW 4: Smart Matching Engine (Voice Enabled)
 // ----------------------------------------------------------------------------
 function MatchingView() {
+    const [desc, setDesc] = useState('');
     const [analyzing, setAnalyzing] = useState(false);
     const [results, setResults] = useState(null);
 
@@ -369,11 +450,11 @@ function MatchingView() {
             setResults([
                 {
                     name: "Udaan B2B ONDC Node",
-                    region: "North India (Kanpur/Delhi)",
+                    region: desc.toLowerCase().includes('kanpur') || desc.toLowerCase().includes('delhi') ? "North India" : "Pan India",
                     capacity_suitability: "High Volume",
                     success_rate: "94%",
                     match_score: 98,
-                    reason: "Perfect sync for Leather Apparel from Kanpur with established logistics chain."
+                    reason: "Perfect sync based on your spoken profile for logistics."
                 },
                 {
                     name: "Mystore Hub",
@@ -381,34 +462,30 @@ function MatchingView() {
                     capacity_suitability: "Medium Volume",
                     success_rate: "89%",
                     match_score: 85,
-                    reason: "Good for boutique ethnic wear but takes slightly higher margins on heavy goods."
+                    reason: "Good backup option but takes slightly higher margins."
                 }
             ]);
             setAnalyzing(false);
-        }, 1500);
+        }, 2000);
     }
 
     return (
         <div className="animate-fade-in">
             <div style={{ marginBottom: '24px' }}>
                 <h2 style={{ fontSize: '24px', marginBottom: '8px' }}>4️⃣ Smart Matching Engine</h2>
-                <p style={{ color: 'var(--text-muted)' }}>Match the MSE's profile (Product, Region, Production Capacity) with the best Seller Network Participant (SNP).</p>
+                <p style={{ color: 'var(--text-muted)' }}>Match the MSE's profile with the best Seller Network Participant (SNP). Describe your business needs using voice.</p>
             </div>
 
-            <div className="card" style={{ marginBottom: '24px', background: 'linear-gradient(to right, #0f172a, #1e293b)', color: 'white' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-                    <div>
-                        <div style={{ fontSize: '12px', textTransform: 'uppercase', color: '#94a3b8', marginBottom: '4px' }}>Current MSE Profile Detected</div>
-                        <div style={{ fontSize: '18px', fontWeight: '600' }}>Kanpur Leather Goods Manufacturer</div>
-                        <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-                            <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', color: '#cbd5e1' }}>Location: UP West</span>
-                            <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', color: '#cbd5e1' }}>Capacity: 500 units/mo</span>
-                        </div>
-                    </div>
-                    <button className="btn btn-primary" onClick={handleMatch} disabled={analyzing} style={{ background: '#3b82f6' }}>
-                        {analyzing ? 'Running Algorithm...' : 'Find Best SNP Partners'}
-                    </button>
-                </div>
+            <div className="card" style={{ marginBottom: '24px' }}>
+                <VoiceInputBox
+                    value={desc}
+                    onChange={setDesc}
+                    placeholder='E.g., "Hum kanpur me manufacturing karte hain aur mujhe PAN India delivery chahiye."'
+                    onSubmit={handleMatch}
+                    submitLabel={analyzing ? "Finding Best Partners..." : "Find Best SNP Partners"}
+                    icon={NetworkIcon}
+                    height="120px"
+                />
             </div>
 
             {results && (
