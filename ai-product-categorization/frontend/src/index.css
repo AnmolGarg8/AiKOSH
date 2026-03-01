@@ -1,14 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary: #0A1628;
-  --secondary: #2979E8;
-  --bg-color: #F1F5F9;
+  --primary: #0F4C81;
+  /* Gov Navy Blue */
+  --secondary: #F26522;
+  /* Gov Saffron/Orange */
+  --bg-color: #F8FAFC;
   --surface: #FFFFFF;
-  --text-main: #0A1628;
+  --text-main: #1E293B;
   --text-muted: #64748B;
   --border: #E2E8F0;
   --success: #15803D;
+  /* India Green */
   --warning: #D97706;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -63,6 +66,45 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.top-gov-bar {
+  background: #F1F5F9;
+  color: #334155;
+  font-size: 12px;
+  padding: 6px 24px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #E2E8F0;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.top-gov-bar-left {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.india-flag {
+  display: inline-block;
+  width: 16px;
+  height: 10px;
+  background: linear-gradient(to bottom, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%);
+  border: 1px solid #CBD5E1;
+  position: relative;
+}
+
+.india-flag::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3px;
+  height: 3px;
+  background: #000080;
+  border-radius: 50%;
 }
 
 .gov-header {
@@ -229,16 +271,16 @@ body {
 }
 
 .hero-title {
-  font-size: 40px;
+  font-size: 36px;
   font-weight: 700;
   margin-bottom: 20px;
   color: var(--primary);
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .hero-subtitle {
-  font-size: 18px;
-  color: var(--text-muted);
+  font-size: 16px;
+  color: #334155;
   margin-bottom: 32px;
   line-height: 1.6;
 }

@@ -11,13 +11,28 @@ import MatchingPage from "./pages/MatchingPage";
 const App = () => {
     return (
         <div className="app-container">
+            <div className="top-gov-bar">
+                <div className="top-gov-bar-left">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span className="india-flag"></span>
+                        <span>GOVERNMENT OF INDIA</span>
+                    </div>
+                    <span style={{ color: '#CBD5E1' }}>|</span>
+                    <span>Ministry of Micro, Small & Medium Enterprises</span>
+                </div>
+                <div className="top-gov-bar-right">
+                    <span style={{ marginRight: '16px' }}>Skip to Main Content</span>
+                    <span>A+ A A-</span>
+                </div>
+            </div>
+
             <header className="gov-header">
                 <div className="header-content">
                     <div className="brand">
-                        <span className="logo-icon">🏛️</span>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem" style={{ height: '48px', filter: 'brightness(0) invert(1)' }} />
                         <div>
                             <h1 className="header-title">ONDC Voice Registry</h1>
-                            <p className="header-subtitle">MSME Government Form Auto-Fill System</p>
+                            <p className="header-subtitle">MSME Empowerment Portal</p>
                         </div>
                     </div>
                     <nav className="header-nav">
