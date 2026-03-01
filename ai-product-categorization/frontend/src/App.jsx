@@ -9,6 +9,10 @@ import VerificationPage from "./pages/VerificationPage";
 import MatchingPage from "./pages/MatchingPage";
 
 const App = () => {
+    const handleZoom = (level) => {
+        document.documentElement.style.fontSize = level;
+    };
+
     return (
         <div className="app-container">
             <div className="top-gov-bar">
@@ -21,8 +25,12 @@ const App = () => {
                     <span>Ministry of Micro, Small & Medium Enterprises</span>
                 </div>
                 <div className="top-gov-bar-right">
-                    <span style={{ marginRight: '16px' }}>Skip to Main Content</span>
-                    <span>A+ A A-</span>
+                    <a href="#main-content" style={{ marginRight: '16px', color: 'inherit', textDecoration: 'none' }}>Skip to Main Content</a>
+                    <div style={{ display: 'inline-flex', gap: '8px' }}>
+                        <button onClick={() => handleZoom('110%')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px' }}>A+</button>
+                        <button onClick={() => handleZoom('100%')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px' }}>A</button>
+                        <button onClick={() => handleZoom('90%')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px' }}>A-</button>
+                    </div>
                 </div>
             </div>
 
@@ -45,7 +53,7 @@ const App = () => {
                 </div>
             </header>
 
-            <main className="main-layout">
+            <main className="main-layout" id="main-content">
                 <Switch>
                     <Route path="/" component={Dashboard} />
                     <Route path="/registration" component={FormCatalog} />

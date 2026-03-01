@@ -67,7 +67,7 @@ export default function ReviewSubmit({ params }) {
                     ← Back to Edit
                 </button>
                 <div className="action-group">
-                    <button className="btn btn-outline">📥 Download PDF</button>
+                    <button className="btn btn-outline" onClick={() => window.print()}>📥 Download PDF</button>
                     <button className="btn btn-primary btn-large" onClick={handleSubmit} disabled={submitting}>
                         {submitting ? 'Submitting to Portal...' : 'Confirm & Submit Application'}
                     </button>
