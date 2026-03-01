@@ -52,9 +52,12 @@ export default function MatchingPage() {
                 `}
             </style>
 
-            <div className="page-header">
-                <h2 className="page-title">Smart SNP Matching Engine</h2>
-                <p className="page-desc">Speak out what your business manufactures, your region, and your monthly production capacity. AI will recommend the top Seller Network Participant.</p>
+            <div className="banner-header">
+                <img src="https://images.unsplash.com/photo-1556761175-103db12ba7a8?auto=format&fit=crop&w=1200&q=80" alt="Business Partnership handshake" className="banner-image" />
+                <div className="banner-content">
+                    <h2 className="banner-title">Smart SNP Matching Engine</h2>
+                    <p className="banner-desc">Speak out what your business manufactures, your region, and your monthly production capacity. AI will recommend the top Seller Network Participant.</p>
+                </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>

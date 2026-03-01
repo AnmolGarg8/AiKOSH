@@ -194,22 +194,92 @@ body {
 
 /* Dashboard */
 .hero-section {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  background: white;
+  border-radius: 16px;
+  padding: 48px;
   margin-bottom: 64px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-content {
+  flex: 1;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-image-wrapper {
+  flex: 1;
+  position: relative;
+  height: 320px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.hero-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .hero-title {
-  font-size: 36px;
+  font-size: 40px;
   font-weight: 700;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   color: var(--primary);
+  line-height: 1.2;
 }
 
 .hero-subtitle {
   font-size: 18px;
   color: var(--text-muted);
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.banner-header {
+  position: relative;
+  background: var(--primary);
+  color: white;
+  padding: 64px 48px;
+  border-radius: 16px;
+  margin-bottom: 32px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.banner-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.15;
+  mix-blend-mode: luminosity;
+}
+
+.banner-content {
+  position: relative;
+  z-index: 2;
+}
+
+.banner-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.banner-desc {
+  font-size: 16px;
+  color: #E2E8F0;
   max-width: 600px;
-  margin: 0 auto 32px;
 }
 
 /* Grids & Cards */
@@ -268,11 +338,27 @@ body {
   border-radius: 8px;
   padding: 24px;
   box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 
 .form-card {
   display: flex;
   flex-direction: column;
+  padding: 0;
+}
+
+.form-card-image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-bottom: 1px solid var(--border);
+}
+
+.form-card-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .form-authority {
@@ -305,7 +391,6 @@ body {
   justify-content: space-between;
   align-items: center;
   background: #F8FAFC;
-  border-radius: 0 0 8px 8px;
 }
 
 /* Badges */

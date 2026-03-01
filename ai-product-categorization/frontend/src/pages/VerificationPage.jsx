@@ -60,9 +60,12 @@ export default function VerificationPage() {
                 `}
             </style>
 
-            <div className="page-header">
-                <h2 className="page-title">Document Auto-Verification</h2>
-                <p className="page-desc">Upload GST, PAN, or Udyam copies. Our Verification AI extracts the data and validates via official registry APIs securely.</p>
+            <div className="banner-header">
+                <img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&w=1200&q=80" alt="Security Data Protection" className="banner-image" />
+                <div className="banner-content">
+                    <h2 className="banner-title">Document Auto-Verification</h2>
+                    <p className="banner-desc">Upload GST, PAN, or Udyam copies. Our Verification AI extracts the data and validates via official registry APIs securely.</p>
+                </div>
             </div>
 
             <div className="grid-2">

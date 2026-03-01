@@ -40,9 +40,12 @@ export default function CategorizationPage() {
                 `}
             </style>
 
-            <div className="page-header">
-                <h2 className="page-title">AI Product Categorisation</h2>
-                <p className="page-desc">Speak or type exactly what you sell. We will automatically map it to the correct ONDC taxonomy hierarchy.</p>
+            <div className="banner-header">
+                <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80" alt="Warehouse and Logistics" className="banner-image" />
+                <div className="banner-content">
+                    <h2 className="banner-title">AI Product Categorisation</h2>
+                    <p className="banner-desc">Speak or type exactly what you sell. We will automatically map it to the correct ONDC taxonomy hierarchy.</p>
+                </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
