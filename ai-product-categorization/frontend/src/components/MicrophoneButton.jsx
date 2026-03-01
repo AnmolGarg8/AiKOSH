@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 export default function MicrophoneButton({ onTranscriptUpdate, onStatusChange }) {
     const [isListening, setIsListening] = useState(false);
@@ -67,7 +67,7 @@ export default function MicrophoneButton({ onTranscriptUpdate, onStatusChange })
 
     return (
         <button
-            className={`mic - button ${isListening ? 'active pulsing' : ''} `}
+            className={`mic-button ${isListening ? 'active pulsing' : ''}`}
             onClick={toggleListening}
         >
             <span style={{ fontSize: '32px' }}>{isListening ? '🛑' : '🎙️'}</span>
