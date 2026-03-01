@@ -102,6 +102,7 @@ export default function VoiceFormFill({ params }) {
     }, [formId]);
 
     const handleProcess = async () => {
+        if (guidedActive) window.dispatchEvent(new Event('stop-mic'));
         setStatus('Processing NLP Engine...');
         try {
             const res = await submitVoiceData(formId, transcript);
@@ -124,6 +125,16 @@ export default function VoiceFormFill({ params }) {
             setStatus('Failed to extract data');
         }
     };
+
+    useEffect(() => {
+        let timeout;
+        if (guidedActive && transcript.trim().length > 0) {
+            timeout = setTimeout(() => {
+                handleProcess();
+            }, 2000);
+        }
+        return () => clearTimeout(timeout);
+    }, [transcript, guidedActive]);
 
     const handleFormChange = (key, value) => {
         setExtractedData(prev => ({
@@ -174,14 +185,18 @@ export default function VoiceFormFill({ params }) {
 
                 <div className="action-buttons">
                     <button className="btn btn-outline" onClick={handleClear}>Clear</button>
-                    {!isConfirmed ? (
-                        <button className="btn btn-secondary" onClick={handleVerifyVoice} disabled={!transcript || isVerifying}>
-                            {isVerifying ? 'Speaking...' : 'Verify Input 🗣️'}
-                        </button>
-                    ) : (
-                        <button className="btn btn-primary" onClick={handleProcess} disabled={!transcript || status.includes('Processing')}>
-                            Process & Fill Form ✅
-                        </button>
+                    {!guidedActive && (
+                        <>
+                            {!isConfirmed ? (
+                                <button className="btn btn-secondary" onClick={handleVerifyVoice} disabled={!transcript || isVerifying}>
+                                    {isVerifying ? 'Speaking...' : 'Verify Input 🗣️'}
+                                </button>
+                            ) : (
+                                <button className="btn btn-primary" onClick={handleProcess} disabled={!transcript || status.includes('Processing')}>
+                                    Process & Fill Form ✅
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
