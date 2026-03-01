@@ -4,6 +4,11 @@ export default function MicrophoneButton({ onTranscriptUpdate, onStatusChange })
     const [isListening, setIsListening] = useState(false);
     const [language, setLanguage] = useState('hi-IN');
     const recognitionRef = useRef(null);
+    const isListeningRef = useRef(false);
+
+    useEffect(() => {
+        isListeningRef.current = isListening;
+    }, [isListening]);
 
     const LANGUAGES = [
         { code: 'hi-IN', label: 'Hindi (हिंदी)' },
@@ -25,9 +30,20 @@ export default function MicrophoneButton({ onTranscriptUpdate, onStatusChange })
                     recognitionRef.current.stop();
                 } catch (e) { }
             }
+            setIsListening(false);
+        };
+        const handleStartMic = () => {
+            if (!isListeningRef.current) {
+                const btn = document.getElementById('main-mic-btn');
+                if (btn) btn.click();
+            }
         };
         window.addEventListener('stop-mic', handleStopMic);
-        return () => window.removeEventListener('stop-mic', handleStopMic);
+        window.addEventListener('start-mic', handleStartMic);
+        return () => {
+            window.removeEventListener('stop-mic', handleStopMic);
+            window.removeEventListener('start-mic', handleStartMic);
+        };
     }, []);
 
     const toggleListening = () => {
@@ -102,6 +118,7 @@ export default function MicrophoneButton({ onTranscriptUpdate, onStatusChange })
                 ))}
             </select>
             <button
+                id="main-mic-btn"
                 className={`mic-button ${isListening ? 'active pulsing' : ''}`}
                 onClick={toggleListening}
                 title={`Speak in ${LANGUAGES.find(l => l.code === language)?.label}`}

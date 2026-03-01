@@ -33,6 +33,9 @@ export default function VoiceFormFill({ params }) {
             const msg = new SpeechSynthesisUtterance();
             msg.text = `Please tell me your ${readable}`;
             msg.lang = 'hi-IN';
+            msg.onend = () => {
+                window.dispatchEvent(new Event('start-mic'));
+            };
             window.speechSynthesis.speak(msg);
         } else {
             alert("Form is already fully filled!");
@@ -51,6 +54,9 @@ export default function VoiceFormFill({ params }) {
             const msg = new SpeechSynthesisUtterance();
             msg.text = `Got it. Now, what is your ${readable}?`;
             msg.lang = 'hi-IN';
+            msg.onend = () => {
+                window.dispatchEvent(new Event('start-mic'));
+            };
             setTimeout(() => window.speechSynthesis.speak(msg), 500);
         } else {
             setStatus('Guided Mode: All fields completed!');
