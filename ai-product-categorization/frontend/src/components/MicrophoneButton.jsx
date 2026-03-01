@@ -2,7 +2,21 @@ import React, { useState, useRef, useEffect } from 'react';
 
 export default function MicrophoneButton({ onTranscriptUpdate, onStatusChange }) {
     const [isListening, setIsListening] = useState(false);
+    const [language, setLanguage] = useState('hi-IN');
     const recognitionRef = useRef(null);
+
+    const LANGUAGES = [
+        { code: 'hi-IN', label: 'Hindi (हिंदी)' },
+        { code: 'en-IN', label: 'English (India)' },
+        { code: 'ta-IN', label: 'Tamil (தமிழ்)' },
+        { code: 'te-IN', label: 'Telugu (తెలుగు)' },
+        { code: 'mr-IN', label: 'Marathi (मराठी)' },
+        { code: 'bn-IN', label: 'Bengali (বাংলা)' },
+        { code: 'gu-IN', label: 'Gujarati (ગુજરાતી)' },
+        { code: 'kn-IN', label: 'Kannada (ಕನ್ನಡ)' },
+        { code: 'ml-IN', label: 'Malayalam (മലയാളം)' },
+        { code: 'pa-IN', label: 'Punjabi (ਪੰਜਾਬੀ)' }
+    ];
 
     useEffect(() => {
         const handleStopMic = () => {
@@ -32,7 +46,7 @@ export default function MicrophoneButton({ onTranscriptUpdate, onStatusChange })
             const rc = new SpeechRecognition();
             rc.continuous = true;
             rc.interimResults = true;
-            rc.lang = 'hi-IN';
+            rc.lang = language;
 
             rc.onstart = () => {
                 setIsListening(true);
@@ -66,11 +80,34 @@ export default function MicrophoneButton({ onTranscriptUpdate, onStatusChange })
     };
 
     return (
-        <button
-            className={`mic-button ${isListening ? 'active pulsing' : ''}`}
-            onClick={toggleListening}
-        >
-            <span style={{ fontSize: '32px' }}>{isListening ? '🛑' : '🎙️'}</span>
-        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+            <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                disabled={isListening}
+                style={{
+                    padding: '6px 12px',
+                    borderRadius: '6px',
+                    border: '1px solid #CBD5E1',
+                    fontSize: '13px',
+                    color: '#475569',
+                    fontFamily: 'inherit',
+                    background: '#F8FAFC',
+                    cursor: 'pointer',
+                    outline: 'none'
+                }}
+            >
+                {LANGUAGES.map(lang => (
+                    <option key={lang.code} value={lang.code}>{lang.label}</option>
+                ))}
+            </select>
+            <button
+                className={`mic-button ${isListening ? 'active pulsing' : ''}`}
+                onClick={toggleListening}
+                title={`Speak in ${LANGUAGES.find(l => l.code === language)?.label}`}
+            >
+                <span style={{ fontSize: '32px' }}>{isListening ? '🛑' : '🎙️'}</span>
+            </button>
+        </div>
     );
 }
