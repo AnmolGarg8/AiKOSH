@@ -4,6 +4,8 @@ from fastapi.responses import StreamingResponse
 from models.schemas import ProcessVoiceRequest, ProcessVoiceResponse, FieldExtraction, GeneratePromptRequest, GeneratePromptResponse, SpeakRequest
 from services.voice_extractor import extractor
 import edge_tts
+from gtts import gTTS
+import io
 
 router = APIRouter(
     prefix="/api/v1/voice",
@@ -56,17 +58,29 @@ VOICE_MAP = {
 
 @router.get("/speak")
 async def speak_text(text: str, language: str):
-    voice = VOICE_MAP.get(language, "en-IN-NeerjaNeural")
+    # Route problematic accents (Marathi, Gujarati, Punjabi) to Google's highly natural API
+    google_fallback = ["mr-IN", "gu-IN", "pa-IN"]
     
-    # pa-IN fallback just in case
-    if language == "pa-IN":
-        voice = "en-IN-NeerjaNeural"
+    if language in google_fallback:
+        # Map to 2-letter language code for Google Translate (e.g., 'mr-IN' -> 'mr')
+        lang = language.split("-")[0]
+        tts = gTTS(text=text, lang=lang, slow=False)
+        fp = io.BytesIO()
+        tts.write_to_fp(fp)
+        fp.seek(0)
+        
+        async def generate_google_audio():
+            yield fp.read()
+            
+        return StreamingResponse(generate_google_audio(), media_type="audio/mpeg")
+
+    voice = VOICE_MAP.get(language, "en-IN-NeerjaNeural")
 
     communicate = edge_tts.Communicate(text, voice, rate="-5%")
     
-    async def generate_audio():
+    async def generate_edge_audio():
         async for chunk in communicate.stream():
             if chunk["type"] == "audio":
                 yield chunk["data"]
                 
-    return StreamingResponse(generate_audio(), media_type="audio/mpeg")
+    return StreamingResponse(generate_edge_audio(), media_type="audio/mpeg")
