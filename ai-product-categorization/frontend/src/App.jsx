@@ -4,6 +4,9 @@ import Dashboard from "./pages/Dashboard";
 import FormCatalog from "./pages/FormCatalog";
 import VoiceFormFill from "./pages/VoiceFormFill";
 import ReviewSubmit from "./pages/ReviewSubmit";
+import CategorizationPage from "./pages/CategorizationPage";
+import VerificationPage from "./pages/VerificationPage";
+import MatchingPage from "./pages/MatchingPage";
 
 const App = () => {
     return (
@@ -20,6 +23,9 @@ const App = () => {
                     <nav className="header-nav">
                         <a href="/">Dashboard</a>
                         <a href="/registration">Registration</a>
+                        <a href="/categorization">AI Categorisation</a>
+                        <a href="/verification">Quick Verification</a>
+                        <a href="/matching">Matching SNP</a>
                     </nav>
                 </div>
             </header>
@@ -30,6 +36,9 @@ const App = () => {
                     <Route path="/registration" component={FormCatalog} />
                     <Route path="/registration/:formId" component={VoiceFormFill} />
                     <Route path="/review/:formId" component={ReviewSubmit} />
+                    <Route path="/categorization" component={CategorizationPage} />
+                    <Route path="/verification" component={VerificationPage} />
+                    <Route path="/matching" component={MatchingPage} />
                 </Switch>
             </main>
 
