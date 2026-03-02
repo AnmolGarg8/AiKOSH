@@ -55,21 +55,48 @@ export default function VoiceFormFill({ params }) {
     // Fallback if network stream gets blocked by browser policies
     const fallbackSyntheticTTS = (text, langCode, onEndCallback) => {
         const msg = new SpeechSynthesisUtterance(text);
-        msg.lang = langCode;
+
+        // Map exact dialects for the best possible browser TTS engines to avoid lag
+        const exactBrowserLangs = {
+            "hi-IN": "hi-IN",
+            "en-IN": "en-IN",
+            "ta-IN": "ta-IN",
+            "te-IN": "te-IN",
+            "mr-IN": "mr-IN",
+            "bn-IN": "bn-IN",
+            "gu-IN": "gu-IN",
+            "kn-IN": "kn-IN",
+            "ml-IN": "ml-IN",
+            "pa-IN": "pa-IN"
+        };
+        const activeLang = exactBrowserLangs[langCode] || "hi-IN";
+        msg.lang = activeLang;
         msg.rate = 0.95;
         msg.pitch = 1.05;
 
         const voices = window.speechSynthesis.getVoices();
-        let bestVoice = voices.find(v => v.lang.includes(langCode) && v.name.includes('Google'));
-        if (!bestVoice) bestVoice = voices.find(v => v.lang.includes(langCode));
-        if (!bestVoice && langCode.includes('-')) {
-            const baseLang = langCode.split('-')[0];
-            bestVoice = voices.find(v => v.lang.startsWith(baseLang) && v.name.includes('Google'));
-            if (!bestVoice) bestVoice = voices.find(v => v.lang.startsWith(baseLang));
+
+        // Priority 1: Google Native (Android/Chrome)
+        let exactVoice = voices.find(v => v.lang === activeLang && v.name.includes("Google"));
+        // Priority 2: Microsoft/Apple Native (Windows/Mac)
+        if (!exactVoice) exactVoice = voices.find(v => v.lang === activeLang && (v.name.includes("Microsoft") || v.name.includes("Apple")));
+        // Priority 3: Any voice matching lang
+        if (!exactVoice) exactVoice = voices.find(v => v.lang === activeLang);
+        // Priority 4: Loose sub-tag match (e.g. 'hi')
+        if (!exactVoice) {
+            const baseLang = activeLang.split("-")[0];
+            exactVoice = voices.find(v => v.lang.startsWith(baseLang) && v.name.includes("Google"));
+            if (!exactVoice) exactVoice = voices.find(v => v.lang.startsWith(baseLang));
         }
 
-        if (bestVoice) msg.voice = bestVoice;
-        if (onEndCallback) msg.onend = onEndCallback;
+        if (exactVoice) {
+            msg.voice = exactVoice;
+        }
+
+        if (onEndCallback) {
+            msg.onend = onEndCallback;
+        }
+
         window.speechSynthesis.speak(msg);
     };
 
