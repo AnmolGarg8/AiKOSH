@@ -126,14 +126,16 @@ export default function VoiceFormFill({ params }) {
         setIsConfirmed(false);
     };
 
-    const handleVerifyVoice = () => {
+    const handleVerifyVoice = async () => {
         if (!transcript) return;
         window.dispatchEvent(new Event('stop-mic'));
         setIsVerifying(true);
         setStatus('Verifying Input...');
-
         window.speechSynthesis.cancel();
-        speakNativeTTS(`You said: ${transcript}. Is this information correct and ready to proceed?`, 'hi-IN', () => {
+
+        const p = await generateGuidedPrompt(`VERIFY: ${transcript}`, language);
+
+        speakNativeTTS(p.prompt, language, () => {
             setIsVerifying(false);
             setIsConfirmed(true);
             setStatus('Verified. Ready to Fill Form.');

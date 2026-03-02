@@ -97,6 +97,9 @@ class VoiceExtractorService:
         
         if field == "COMPLETED":
             prompt_instruction = "Tell the user that the form is completely filled and they can proceed to review and submit."
+        elif field.startswith("VERIFY:"):
+            txt_to_verify = field.split("VERIFY:", 1)[1].strip()
+            prompt_instruction = f"Say: 'You said: {txt_to_verify}. Is this information correct and ready to proceed?'"
         else:
             prompt_instruction = f"Politely ask the user: 'What is your {field}?'"
 
@@ -145,6 +148,8 @@ class VoiceExtractorService:
             
         if field == "COMPLETED":
             return "Thank you. The form is fully completed."
+        elif field.startswith("VERIFY:"):
+            return f"You said: {field.split('VERIFY:', 1)[1].strip()}. Is this correct?"
         return f"Got it. Now, what is your {field}?"
 
 extractor = VoiceExtractorService()
