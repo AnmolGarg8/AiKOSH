@@ -64,13 +64,19 @@ async def speak_text(text: str, language: str):
     if language in google_fallback:
         # Map to 2-letter language code for Google Translate (e.g., 'mr-IN' -> 'mr')
         lang = language.split("-")[0]
-        tts = gTTS(text=text, lang=lang, slow=False)
-        fp = io.BytesIO()
-        tts.write_to_fp(fp)
-        fp.seek(0)
+        
+        import asyncio
+        def create_audio():
+            tts = gTTS(text=text, lang=lang, slow=False)
+            fp = io.BytesIO()
+            tts.write_to_fp(fp)
+            fp.seek(0)
+            return fp.read()
+            
+        audio_data = await asyncio.to_thread(create_audio)
         
         async def generate_google_audio():
-            yield fp.read()
+            yield audio_data
             
         return StreamingResponse(generate_google_audio(), media_type="audio/mpeg")
 

@@ -8,7 +8,9 @@ from typing import Dict, Any, List
 class VoiceExtractorService:
     def __init__(self):
         # Load form schemas to know what fields to look for
-        with open("data/forms_catalog.json", "r") as f:
+        base_dir = os.path.dirname(os.path.dirname(__file__))
+        forms_path = os.path.join(base_dir, "data", "forms_catalog.json")
+        with open(forms_path, "r", encoding="utf-8") as f:
             self.catalog = json.load(f)
             
     def get_form_fields(self, form_id: str) -> List[str]:
