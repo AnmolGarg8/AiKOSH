@@ -47,12 +47,12 @@ export const fetchForms = async () => {
     }
 };
 
-export const submitVoiceData = async (formId, transcript, language = 'en') => {
+export const submitVoiceData = async (formId, transcript, language = 'en', expectedField = null) => {
     try {
         const res = await fetch(`${API_URL}/voice/process`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ form_id: formId, transcript, language })
+            body: JSON.stringify({ form_id: formId, transcript, language, expected_field: expectedField })
         });
         if (!res.ok) throw new Error("Voice processing failed");
         return await res.json();
@@ -63,11 +63,16 @@ export const submitVoiceData = async (formId, transcript, language = 'en') => {
         const fields = formDef ? formDef.fields : [];
         if (fields.length === 0) return { status: "error", extracted_fields: {}, unfilled_fields: [] };
 
+        let hint = "";
+        if (expectedField) {
+            hint = `\n        CRITICAL HINT: The user was just explicitly asked to provide the field '${expectedField}'. Even if the transcript is a single raw word, number, or lacks context, strongly prioritize mapping it to '${expectedField}'.`;
+        }
+
         const systemPrompt = `You are a highly intelligent Indian Government Form Data Extractor.
         Given a user's speech transcript (which could be in English, Hindi, or any Indian language), 
         extract the specific values for the following target fields: ${JSON.stringify(fields)}.
         Translate the answers natively into English (Title Case for names/cities).
-        Format Requirement: The JSON must have a top-level key "extracted" mapping to objects containing "value" and "confidence" (0.0 to 1.0 float).`;
+        Format Requirement: The JSON must have a top-level key "extracted" mapping to objects containing "value" and "confidence" (0.0 to 1.0 float).${hint}`;
 
         try {
             const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {

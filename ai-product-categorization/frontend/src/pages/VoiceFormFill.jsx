@@ -187,7 +187,8 @@ export default function VoiceFormFill({ params }) {
         if (guidedActive) window.dispatchEvent(new Event('stop-mic'));
         setStatus('Processing NLP Engine...');
         try {
-            const res = await submitVoiceData(formId, transcript);
+            const expectedField = guidedActive ? getNextUnfilledField() : null;
+            const res = await submitVoiceData(formId, transcript, language, expectedField);
             setExtractedData(prev => {
                 const merged = { ...prev };
                 for (let key in res.extracted_fields) {
@@ -213,7 +214,7 @@ export default function VoiceFormFill({ params }) {
         if (guidedActive && transcript.trim().length > 0) {
             timeout = setTimeout(() => {
                 handleProcess();
-            }, 2000);
+            }, 1200);
         }
         return () => clearTimeout(timeout);
     }, [transcript, guidedActive]);

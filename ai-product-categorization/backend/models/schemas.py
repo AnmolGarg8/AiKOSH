@@ -5,6 +5,7 @@ class ProcessVoiceRequest(BaseModel):
     form_id: str
     transcript: str
     language: str = "en"
+    expected_field: Optional[str] = None
 
 class FieldExtraction(BaseModel):
     value: Any

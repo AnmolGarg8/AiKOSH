@@ -19,7 +19,7 @@ class VoiceExtractorService:
                 return form["fields"]
         return []
 
-    def extract_fields(self, form_id: str, transcript: str) -> dict:
+    def extract_fields(self, form_id: str, transcript: str, expected_field: str = None) -> dict:
         """
         Intelligent LLM extractor using Groq API.
         Handles English, Hindi, transliterated text, and other Indian regional languages flawlessly.
@@ -33,12 +33,16 @@ class VoiceExtractorService:
         # Read from ENV or use the demo key provided by user (split to avoid GitHub blocking the push)
         api_key = os.environ.get("GROQ_API_KEY", "gsk_m52" + "tJ6POJqbqGisMDFHUWGdyb3FYclUOn9pahoiSwVc3oxR6XHFh")
         
+        hint = ""
+        if expected_field:
+            hint = f"\n        CRITICAL HINT: The user was just explicitly asked to provide the field '{expected_field}'. Even if the transcript is a single raw word, number, or lacks context, you MUST strongly prioritize mapping it to the field '{expected_field}'."
+        
         system_prompt = f"""
         You are a highly intelligent Indian Government Form Data Extractor.
         Given a user's speech transcript (which could be in English, Hindi transliterated in Latin script, Devanagari, or any Indian language), 
         extract the specific values for the following target fields: {json.dumps(fields_to_find)}.
         
-        Instructions:
+        Instructions:{hint}
         1. Translate and standardize the extracted values to clean English (e.g., Title Case for names, addresses, and cities).
         2. Clean numeric fields (Aadhaar should be 12 digits, PAN should be uppercase letters and numbers, PIN code should be 6 digits).
         3. Do NOT make up any information. Only extract what is clearly present in the transcript.

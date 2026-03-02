@@ -17,10 +17,7 @@ def process_voice(req: ProcessVoiceRequest):
     start_time = time.time()
     
     # Process transcript
-    result = extractor.extract_fields(req.form_id, req.transcript)
-    
-    # Simulate network latency
-    time.sleep(0.5)
+    result = extractor.extract_fields(req.form_id, req.transcript, getattr(req, "expected_field", None))
     
     processing_time_ms = int((time.time() - start_time) * 1000)
     
