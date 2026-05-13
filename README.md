@@ -1,122 +1,66 @@
-# 🎙️ AiKOSH | AI Voice Form Auto-Fill System
+# AiKOSH: Voice-to-Inventory for Small Businesses
 
 <p align="center">
   <img src="assets/banner.png" alt="AiKOSH Banner" width="100%">
 </p>
 
-<p align="center">
-  <a href="https://reactjs.org/"><img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React"></a>
-  <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/FastAPI-05998b?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"></a>
-  <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite"></a>
-  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"></a>
-</p>
+Managing inventory is one of the most time-consuming parts of running a small business. **AiKOSH** simplifies this by letting you onboard products using just your voice. 
+
+Instead of typing out descriptions, categories, and prices, you can just describe the product out loud. The system extracts the relevant details and maps them to your catalog automatically.
 
 ---
 
-## 📖 Overview
+### 🚀 What it does
 
-**AiKOSH** is a cutting-edge **AI-powered voice extraction and categorization system** designed to streamline small business onboarding. By leveraging advanced Natural Language Processing (NLP) and Audio Analysis, AiKOSH automatically extracts product data from voice transcripts and categorizes them with high precision, eliminating manual data entry.
+*   **Voice Extraction**: Takes raw audio, transcribes it, and pulls out product attributes (name, price, description).
+*   **Auto-Categorization**: Uses a classification layer to decide where the product fits in your existing catalog.
+*   **Real-time Feedback**: You can see the transcript as you speak, ensuring the AI captured everything correctly.
+*   **Form Integration**: Pushes the extracted data directly into your onboarding forms.
 
-Whether it's a casual voice note about a new product or a formal description, AiKOSH processes the audio, extracts key attributes, and maps them to a structured catalog in real-time.
+### 🛠 The Tech Stack
 
----
+I chose these technologies to keep the system fast and the developer experience smooth:
 
-## ✨ Key Features
-
-- **🗣️ Voice-to-Data Extraction:** Seamlessly convert spoken product descriptions into structured JSON data.
-- **🏷️ Intelligent Categorization:** Multi-layered classification engine that maps products to predefined business categories.
-- **⚡ Real-time Transcription:** Live visual feedback of the transcription process for immediate validation.
-- **🧩 Modular Architecture:** Separate, high-performance Backend (FastAPI) and Frontend (React + Vite) modules.
-- **📊 Form Auto-Fill:** Automatically populates complex business forms from simple voice inputs.
-
----
-
-## 🏗️ System Architecture
-
-```mermaid
-graph LR
-    User((User)) -->|Voice/Audio| Frontend[React Web App]
-    Frontend -->|POST /voice| Backend[FastAPI Server]
-    Backend -->|Extract| VoiceExtractor[Voice Extractor Service]
-    VoiceExtractor -->|Raw Text| Classifier[AI Product Classifier]
-    Classifier -->|JSON| Frontend
-    Frontend -->|Display| UI[Auto-filled Form]
-```
+*   **Frontend**: Built with **React** and **Vite** for a snappy, responsive UI.
+*   **Backend**: Powered by **FastAPI** (Python), chosen for its speed and native support for asynchronous tasks.
+*   **State Management**: Simple and effective data handling to ensure the voice-to-form flow is seamless.
 
 ---
 
-## 🛠️ Tech Stack
+### 📂 How it's organized
 
-| Component | Technology |
-| :--- | :--- |
-| **Frontend** | React, Vite, Framer Motion, CSS3 |
-| **Backend** | FastAPI, Python 3.10+, Uvicorn |
-| **AI/NLP** | Custom Logic & ML Classifiers |
-| **Data Storage** | JSON-based Catalog Systems |
-| **Deployment** | Vercel (Frontend), FastAPI (Backend) |
+The repository is split into two main parts:
+
+*   **/backend**: The Python core. This is where the voice processing logic and the categorization models live.
+*   **/frontend**: The React application. Handles the audio recording, real-time transcription display, and the final form-filling UI.
 
 ---
 
-## 🚀 Installation & Setup
+### 🏁 Getting Started
 
-### 1. Clone the Project
-```bash
-git clone https://github.com/AnmolGarg8/AiKOSH.git
-cd AiKOSH
-```
+If you want to run this locally, follow these steps:
 
-### 2. Backend Setup
-```bash
-cd ai-product-categorization/backend
-python -m venv venv
-source venv/bin/activate # Windows: .\venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
+#### Backend Setup
+1. Move into the backend folder: `cd ai-product-categorization/backend`
+2. Create a virtual environment: `python -m venv venv`
+3. Activate it: `source venv/bin/activate` (or `.\venv\Scripts\activate` on Windows)
+4. Install dependencies: `pip install -r requirements.txt`
+5. Fire up the server: `uvicorn main:app --reload`
 
-### 3. Frontend Setup
-```bash
-cd ../frontend
-npm install
-npm run dev
-```
+#### Frontend Setup
+1. Move into the frontend folder: `cd ../frontend`
+2. Install the packages: `npm install`
+3. Start the dev server: `npm run dev`
+
+Open your browser to the local URL (usually `localhost:5173`) and you're good to go.
 
 ---
 
-## 📁 Project Structure
-
-```text
-AiKOSH/
-└── ai-product-categorization/
-    ├── backend/           # FastAPI Application
-    │   ├── routers/       # API Routes (Voice, Categorization)
-    │   ├── services/      # Business Logic (Extractors, Classifiers)
-    │   └── data/          # Product Catalogs
-    └── frontend/          # React Vite Application
-        ├── src/           # Component Logic
-        └── public/        # Static Assets
-```
+### 🛤 Roadmap
+* [ ] Integration with more robust LLM providers for better extraction accuracy.
+* [ ] Mobile-first UI refinements for on-the-go inventory management.
+* [ ] Support for multi-lingual product descriptions.
 
 ---
 
-## 🤝 Contributing
-
-We welcome contributions to make AiKOSH even better!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/NewFeature`)
-3. Commit your Changes (`git commit -m 'Add some NewFeature'`)
-4. Push to the Branch (`git push origin feature/NewFeature`)
-5. Open a Pull Request
-
----
-
-## 📝 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
----
-
-<p align="center">
-  Built with precision by <a href="https://github.com/AnmolGarg8">Anmol Garg</a>
-</p>
+Built by [Anmol Garg](https://github.com/AnmolGarg8)
