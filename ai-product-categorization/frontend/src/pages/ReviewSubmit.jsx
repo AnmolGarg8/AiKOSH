@@ -18,19 +18,46 @@ export default function ReviewSubmit({ params }) {
         });
     }, [formId]);
 
+    const [successCategory, setSuccessCategory] = useState(null);
+
     const handleSubmit = async () => {
         setSubmitting(true);
         try {
             const cleanData = {};
             Object.keys(data).forEach(k => cleanData[k] = data[k].value);
-            await submitFinalForm(formId, cleanData);
-            alert("Form successfully registered with Government Portal!");
-            setLocation("/");
+            const res = await submitFinalForm(formId, cleanData);
+            setSuccessCategory(res.category || "textiles");
         } catch (e) {
             alert("Submission failed");
             setSubmitting(false);
         }
     };
+
+    if (successCategory) {
+        return (
+            <div className="fade-in" style={{ 
+                textAlign: 'center', 
+                padding: '48px 24px', 
+                background: 'white', 
+                borderRadius: '8px', 
+                border: '1px solid var(--border)',
+                maxWidth: '650px',
+                margin: '40px auto',
+                boxShadow: 'var(--shadow-md)'
+            }}>
+                <div style={{ fontSize: '64px', marginBottom: '24px' }}>🇮🇳</div>
+                <h2 style={{ color: 'var(--success)', marginBottom: '16px', fontWeight: '700' }}>Registration Completed!</h2>
+                <p style={{ fontSize: '16px', color: 'var(--text-main)', lineHeight: '1.6', marginBottom: '32px' }}>
+                    Your enterprise registration form has been validated and recorded. <br />
+                    <strong style={{ color: 'var(--primary)' }}>Your profile is now visible to requirement postings in "{successCategory.toUpperCase()}"</strong>.
+                </p>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
+                    <button className="btn btn-outline" onClick={() => setLocation('/matching')}>View Matching Demands</button>
+                    <button className="btn btn-primary" onClick={() => setLocation('/')}>Return to Dashboard</button>
+                </div>
+            </div>
+        );
+    }
 
     if (!formDef) return <div className="loading">Preparing formal review...</div>;
 

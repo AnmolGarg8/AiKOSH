@@ -1,20 +1,22 @@
 import React from 'react';
 import { useLocation } from "wouter";
+import { useTranslation } from 'react-i18next';
 
 export default function Dashboard() {
     const [, setLocation] = useLocation();
+    const { t } = useTranslation();
 
     return (
         <div className="fade-in">
             <div className="hero-section">
                 <div className="hero-content">
                     <div className="badge badge-success" style={{ marginBottom: '16px', display: 'inline-flex' }}>Digital India Initiative</div>
-                    <h2 className="hero-title">Simplify Governance with Voice AI</h2>
+                    <h2 className="hero-title">{t('welcome_title')}</h2>
                     <p className="hero-subtitle">
-                        Empowering MSMEs to fill complex government registration forms in minutes. Just speak your details naturally in Hindi or English, and our system does the rest.
+                        {t('welcome_desc')}
                     </p>
                     <button className="btn btn-primary btn-large" onClick={() => setLocation('/registration')}>
-                        Start Auto-Fill Registration →
+                        {t('btn_start_reg')}
                     </button>
                 </div>
                 <div className="hero-image-wrapper">
@@ -26,17 +28,17 @@ export default function Dashboard() {
                 <div className="stat-card">
                     <div style={{ fontSize: '32px', marginBottom: '12px' }}>📝</div>
                     <div className="stat-val">4+</div>
-                    <div className="stat-label">Official Forms Integrated</div>
+                    <div className="stat-label">{t('stat_integrated')}</div>
                 </div>
                 <div className="stat-card">
                     <div style={{ fontSize: '32px', marginBottom: '12px' }}>🗣️</div>
                     <div className="stat-val">Bilingual</div>
-                    <div className="stat-label">Hindi & English Supported</div>
+                    <div className="stat-label">{t('stat_bilingual')}</div>
                 </div>
                 <div className="stat-card">
                     <div style={{ fontSize: '32px', marginBottom: '12px' }}>⚡</div>
                     <div className="stat-val">100%</div>
-                    <div className="stat-label">Paperless Verification</div>
+                    <div className="stat-label">{t('stat_paperless')}</div>
                 </div>
             </div>
         </div>

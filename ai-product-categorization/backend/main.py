@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import forms, voice, categorize
+from routers import forms, voice, categorize, auth, matching
 
 app = FastAPI(title="AI Voice Form Auto-Fill System")
 
@@ -12,6 +12,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
+app.include_router(matching.router)
 app.include_router(forms.router)
 app.include_router(voice.router)
 app.include_router(categorize.router)

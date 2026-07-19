@@ -1,5 +1,14 @@
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
+export const getAuthHeaders = () => {
+    const token = localStorage.getItem('aikosh_token');
+    const headers = { "Content-Type": "application/json" };
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+    return headers;
+};
+
 const defaultForms = [
     {
         id: "udyam-001",
@@ -37,7 +46,9 @@ const defaultForms = [
 
 export const fetchForms = async () => {
     try {
-        const res = await fetch(`${API_URL}/forms`);
+        const res = await fetch(`${API_URL}/forms`, {
+            headers: getAuthHeaders()
+        });
         if (!res.ok) throw new Error("Failed to fetch forms");
         const data = await res.json();
         // Merge images back into data since API doesn't have them
@@ -51,7 +62,7 @@ export const submitVoiceData = async (formId, transcript, language = 'en', expec
     try {
         const res = await fetch(`${API_URL}/voice/process`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: getAuthHeaders(),
             body: JSON.stringify({ form_id: formId, transcript, language, expected_field: expectedField })
         });
         if (!res.ok) throw new Error("Voice processing failed");
@@ -118,7 +129,7 @@ export const submitFinalForm = async (formId, fields) => {
     try {
         const res = await fetch(`${API_URL}/forms/submit`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: getAuthHeaders(),
             body: JSON.stringify({ form_id: formId, fields })
         });
         if (!res.ok) throw new Error("Form submission failed");
@@ -132,7 +143,7 @@ export const predictCategory = async (description) => {
     try {
         const res = await fetch(`${API_URL}/categorize/predict`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: getAuthHeaders(),
             body: JSON.stringify({ description })
         });
         if (!res.ok) throw new Error("Categorization failed");
@@ -214,7 +225,7 @@ export const generateGuidedPrompt = async (field, language) => {
     try {
         const res = await fetch(`${API_URL}/voice/prompt`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: getAuthHeaders(),
             body: JSON.stringify({ field, language })
         });
 

@@ -1,8 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 import time
 from fastapi.responses import StreamingResponse
 from models.schemas import ProcessVoiceRequest, ProcessVoiceResponse, FieldExtraction, GeneratePromptRequest, GeneratePromptResponse, SpeakRequest
 from services.voice_extractor import extractor
+from routers.auth import get_current_user
 import edge_tts
 from gtts import gTTS
 import io
@@ -13,7 +14,7 @@ router = APIRouter(
 )
 
 @router.post("/process", response_model=ProcessVoiceResponse)
-def process_voice(req: ProcessVoiceRequest):
+def process_voice(req: ProcessVoiceRequest, current_user=Depends(get_current_user)):
     start_time = time.time()
     
     # Process transcript
@@ -36,7 +37,7 @@ def process_voice(req: ProcessVoiceRequest):
     )
 
 @router.post("/prompt", response_model=GeneratePromptResponse)
-def generate_prompt(req: GeneratePromptRequest):
+def generate_prompt(req: GeneratePromptRequest, current_user=Depends(get_current_user)):
     prompt = extractor.generate_prompt(req.field, req.language)
     return GeneratePromptResponse(prompt=prompt)
 
