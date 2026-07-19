@@ -48,6 +48,18 @@ export default function Login({ onLoginSuccess }) {
         }
     };
 
+    const handleSkip = () => {
+        const tokenVal = 'offline_bypass_token';
+        localStorage.setItem('aikosh_token', tokenVal);
+        localStorage.setItem('aikosh_email', 'demo.official@indiaai.gov.in');
+        localStorage.setItem('aikosh_role', 'official');
+
+        if (onLoginSuccess) {
+            onLoginSuccess(tokenVal);
+        }
+        setLocation('/');
+    };
+
     return (
         <div style={{
             display: 'flex',
@@ -140,9 +152,18 @@ export default function Login({ onLoginSuccess }) {
                         type="submit"
                         className="btn btn-primary btn-large"
                         disabled={loading}
-                        style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                        style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '12px' }}
                     >
                         {loading ? 'Authenticating...' : t('btn_login')}
+                    </button>
+
+                    <button
+                        type="button"
+                        className="btn btn-outline btn-large"
+                        onClick={handleSkip}
+                        style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#F8FAFC' }}
+                    >
+                        Skip & Enter Portal (Demo Mode) →
                     </button>
                 </form>
 
