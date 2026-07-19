@@ -7,7 +7,7 @@ app = FastAPI(title="AI Voice Form Auto-Fill System")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
