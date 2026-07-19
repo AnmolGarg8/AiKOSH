@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from db import engine, Base, SessionLocal
 from models.auth import User
 from models.agent_mapping import VendorProfile, RequirementPosting
-from models.negotiation import Negotiation
+from models.negotiation import DisputeCase, UploadedDocument, SettlementDraft
 from models.ayush import AyushHealth
 import bcrypt
 
