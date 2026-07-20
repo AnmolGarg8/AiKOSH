@@ -8,7 +8,8 @@ from db import engine, Base, SessionLocal
 from models.auth import User
 from models.agent_mapping import VendorProfile, RequirementPosting
 from models.negotiation import DisputeCase, UploadedDocument, SettlementDraft
-from models.ayush import AyushHealth
+from models.ayush import HealthRecord, UserProfile, Recommendation
+from services.ayush_service import generate_ayush_synthetic_data
 import bcrypt
 
 def hash_password(password: str) -> str:
@@ -284,6 +285,19 @@ def init_db():
             )
             session.add(vendor)
             
+        # Seed AYUSH HealthRecords
+        print("Generating and seeding AYUSH historical health records...")
+        ayush_data = generate_ayush_synthetic_data()
+        for record in ayush_data:
+            db_record = HealthRecord(
+                district=record["district"],
+                month=record["month"],
+                year=record["year"],
+                symptom_category=record["symptom_category"],
+                reported_cases=record["reported_cases"]
+            )
+            session.add(db_record)
+
         session.commit()
         print("Database initialized and seeded successfully.")
     except Exception as e:

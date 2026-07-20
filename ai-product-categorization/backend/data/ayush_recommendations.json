@@ -1,0 +1,68 @@
+[
+  {
+    "dosha_type": "vata",
+    "symptom_tags": ["joint_pain", "dry_skin", "insomnia"],
+    "lifestyle_factors": ["high_stress", "poor_sleep"],
+    "recommended_treatments": [
+      "Abhyanga (Warm Sesame Oil Massage) before sleeping",
+      "Pranayama (Nadi Shodhana / Alternate Nostril Breathing) for 10 minutes daily",
+      "Consuming warm Ashwagandha milk at night",
+      "Gentle joints mobilization exercises (Sukshma Vyayama)"
+    ],
+    "recommended_lifestyle_changes": [
+      "Maintain a consistent sleep-wake schedule (sleeping by 10:00 PM)",
+      "Avoid dry, cold, or raw foods; prefer warm, soupy, and cooked meals",
+      "Minimize multitasking and practice mindfulness meditation",
+      "Ensure adequate hydration with warm water throughout the day"
+    ]
+  },
+  {
+    "dosha_type": "pitta",
+    "symptom_tags": ["acid_reflux", "skin_rashes", "excessive_heat"],
+    "lifestyle_factors": ["high_stress", "spicy_diet"],
+    "recommended_treatments": [
+      "Shatavari herb infusion (500mg) once daily",
+      "Sheetali Pranayama (Cooling breath technique) for 5-10 minutes",
+      "Application of pure coconut oil to soothe skin irritation",
+      "Gentle cooling Yoga postures like Child's Pose and Moon Salutation"
+    ],
+    "recommended_lifestyle_changes": [
+      "Avoid sour, fermented, highly spicy, and deep-fried foods",
+      "Spend time near natural water bodies or lush green environments during cool hours",
+      "Ensure regular meal timings to avoid digestive acidity spikes",
+      "Avoid direct sun exposure during peak hours (11:00 AM - 3:00 PM)"
+    ]
+  },
+  {
+    "dosha_type": "kapha",
+    "symptom_tags": ["congestion", "lethargy", "weight_gain"],
+    "lifestyle_factors": ["sedentary", "excessive_sleep"],
+    "recommended_treatments": [
+      "Trikatu powder (ginger, black pepper, long pepper) with honey in the morning",
+      "Kapalabhati Pranayama (Shining skull breath) for 5 minutes daily",
+      "Dry powder massage (Udvartana) to stimulate lymphatic flow",
+      "Active Yoga practice like Sun Salutations (Surya Namaskar) at a moderate pace"
+    ],
+    "recommended_lifestyle_changes": [
+      "Incorporate daily moderate-to-vigorous exercise (at least 30-45 minutes walking or jogging)",
+      "Prefer light, warm, dry, and easily digestible foods over heavy, oily, and sweet dishes",
+      "Avoid sleeping during the daytime",
+      "Incorporate stimulating spices like ginger, black pepper, and turmeric into your diet"
+    ]
+  },
+  {
+    "dosha_type": "any",
+    "symptom_tags": ["fatigue", "general_weakness"],
+    "lifestyle_factors": ["sedentary", "high_stress"],
+    "recommended_treatments": [
+      "Daily consumption of 1 teaspoon of Chyawanprash for general immunity",
+      "Practice light stretching and deep diaphragmatic breathing daily",
+      "Consuming warm herbal teas brewed with ginger, Tulsi, and cardamom"
+    ],
+    "recommended_lifestyle_changes": [
+      "Take 10-minute active breaks for every 90 minutes of desk work",
+      "Practice gratitude journaling before sleep to reduce cortisol levels",
+      "Establish a regular routine for daily meals and sleep cycles"
+    ]
+  }
+]
