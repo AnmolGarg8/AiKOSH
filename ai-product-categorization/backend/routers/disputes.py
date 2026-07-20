@@ -15,6 +15,7 @@ from services.disputes import (
     fill_settlement_template
 )
 from routers.auth import get_current_user
+from models.audit import log_audit
 
 router = APIRouter(tags=["disputes"])
 
@@ -52,7 +53,8 @@ def create_dispute(req: DisputeCreate, db: Session = Depends(get_db), current_us
     db.commit()
     db.refresh(db_case)
     
-    # We can attach the English translation metadata or note it
+    log_audit(db, current_user.email, "CREATE_DISPUTE", f"Case ID: {db_case.id}, Parties: {db_case.party_a_name} vs {db_case.party_b_name}")
+    
     return db_case
 
 @router.post("/api/disputes/{id}/documents")
@@ -96,6 +98,8 @@ async def upload_document(
         db.commit()
         db.refresh(doc)
         db.refresh(case)
+        
+        log_audit(db, current_user.email, "UPLOAD_DISPUTE_DOCUMENT", f"Case ID: {case.id}, File: {file.filename}")
         
         return doc
     except Exception as e:
@@ -170,6 +174,8 @@ def generate_draft(id: int, db: Session = Depends(get_db), current_user=Depends(
     db.commit()
     db.refresh(draft)
     
+    log_audit(db, current_user.email, "GENERATE_DISPUTE_DRAFT", f"Case ID: {case.id}")
+    
     return draft
 
 @router.post("/api/disputes/{id}/finalize")
@@ -190,6 +196,9 @@ def finalize_dispute(id: int, payload: DraftCreate, db: Session = Depends(get_db
         db.add(draft)
         
     db.commit()
+    
+    log_audit(db, current_user.email, "FINALIZE_DISPUTE", f"Case ID: {case.id}")
+    
     return {"status": "success", "message": "Dispute resolved and settled."}
 
 @router.get("/api/disputes")

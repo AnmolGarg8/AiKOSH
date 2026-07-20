@@ -7,6 +7,7 @@ from db import get_db
 from models.ayush import HealthRecord, UserProfile, Recommendation
 from services.ayush_service import detect_trends_and_forecast, match_recommendations, DISTRICTS, SYMPTOM_CATEGORIES
 from routers.auth import get_current_user
+from models.audit import log_audit
 
 router = APIRouter(tags=["ayush"])
 
@@ -34,6 +35,9 @@ def get_trends(
         raise HTTPException(status_code=404, detail="No records found for specified district and category")
         
     analysis = detect_trends_and_forecast(records, district, category)
+    
+    log_audit(db, current_user.email, "VIEW_AYUSH_TRENDS", f"District: {district}, Category: {category}")
+    
     return analysis
 
 @router.get("/api/ayush/risk-summary")
@@ -109,6 +113,8 @@ def post_recommendations(
     db.add(rec)
     db.commit()
     db.refresh(rec)
+    
+    log_audit(db, current_user.email, "CREATE_AYUSH_RECOMMENDATION", f"Profile ID: {profile.id}, Dosha: {req.dosha_type}")
     
     return {
         "id": rec.id,

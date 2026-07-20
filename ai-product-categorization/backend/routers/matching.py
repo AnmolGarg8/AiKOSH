@@ -8,6 +8,8 @@ from models.agent_mapping import VendorProfile, RequirementPosting
 from services.matching import matching_engine
 from routers.auth import get_current_user
 
+from models.audit import log_audit
+
 router = APIRouter(tags=["matching"])
 
 class RequirementCreate(BaseModel):
@@ -40,6 +42,9 @@ def create_requirement(req: RequirementCreate, db: Session = Depends(get_db), cu
     db.add(db_req)
     db.commit()
     db.refresh(db_req)
+    
+    log_audit(db, current_user.email, "CREATE_REQUIREMENT", f"Req ID: {db_req.id}, Title: {db_req.title}")
+    
     return db_req
 
 @router.get("/api/requirements/{id}/matches")

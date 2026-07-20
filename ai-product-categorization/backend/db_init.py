@@ -9,6 +9,7 @@ from models.auth import User
 from models.agent_mapping import VendorProfile, RequirementPosting
 from models.negotiation import DisputeCase, UploadedDocument, SettlementDraft
 from models.ayush import HealthRecord, UserProfile, Recommendation
+from models.audit import AuditLog
 from services.ayush_service import generate_ayush_synthetic_data
 import bcrypt
 

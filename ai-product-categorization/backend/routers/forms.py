@@ -20,10 +20,17 @@ def get_forms(current_user=Depends(get_current_user)):
         catalog = json.load(f)
     return catalog
 
+from pydantic import BaseModel
+from models.audit import log_audit
+
+class FormSubmitPayload(BaseModel):
+    form_id: str
+    fields: dict
+
 @router.post("/submit")
-def submit_form(payload: dict, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    fields = payload.get("fields", {})
-    form_id = payload.get("form_id")
+def submit_form(payload: FormSubmitPayload, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    fields = payload.fields
+    form_id = payload.form_id
     
     # Extract values
     name = fields.get("business_name") or fields.get("legal_name") or fields.get("owner_name") or "Unnamed Vendor"
@@ -61,6 +68,8 @@ def submit_form(payload: dict, db: Session = Depends(get_db), current_user=Depen
     db.add(new_vendor)
     db.commit()
     db.refresh(new_vendor)
+
+    log_audit(db, current_user.email, "SUBMIT_FORM", f"Form ID: {form_id}, Business: {name}")
 
     return {
         "status": "success", 
